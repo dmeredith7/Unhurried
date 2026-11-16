@@ -1,0 +1,86 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Calm, low-contrast-background but high-contrast-text palette.
+ * Semantic tokens switch between light and dark below.
+ */
+:root {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --surface-2: #f0ede6;
+  --ink: #2b2d2a;
+  --muted: #5f645d;
+  --line: #e3dfd6;
+  --accent: #3f7a5a;
+  --accent-ink: #ffffff;
+  --accent-soft: #e2efe6;
+  --leisure: #b4682c;
+  --leisure-soft: #fbe9d9;
+  --gentle: #6b6f86; /* "still on your list": neutral, never red */
+  --gentle-soft: #ecebf3;
+  --focus-ring: #3f7a5a;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #171917;
+  --surface: #1f2220;
+  --surface-2: #272a28;
+  --ink: #ebeae5;
+  --muted: #a6aba3;
+  --line: #333733;
+  --accent: #8cc7a2;
+  --accent-ink: #12241a;
+  --accent-soft: #24362b;
+  --leisure: #eab184;
+  --leisure-soft: #3a2b20;
+  --gentle: #b3b5c9;
+  --gentle-soft: #2a2b35;
+  --focus-ring: #8cc7a2;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-leisure: var(--leisure);
+  --color-leisure-soft: var(--leisure-soft);
+  --color-gentle: var(--gentle);
+  --color-gentle-soft: var(--gentle-soft);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

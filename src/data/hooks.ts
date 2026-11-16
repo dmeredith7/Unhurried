@@ -1,0 +1,24 @@
+/**
+ * Reactive hooks. `useLiveQuery` re-runs whenever the underlying tables
+ * change, so screens stay in sync without manual refreshes.
+ */
+import { useLiveQuery } from 'dexie-react-hooks';
+import * as repos from './repos';
+import { DEFAULT_SETTINGS, type Settings, type Space, type Task } from './types';
+
+export function useSpaces(): Space[] | undefined {
+  return useLiveQuery(async () => (await repos.spaces.list()).sort((a, b) => a.order - b.order));
+}
+
+export function useTasks(): Task[] | undefined {
+  return useLiveQuery(() => repos.tasks.list());
+}
+
+export function useSettings(): Settings {
+  return useLiveQuery(() => repos.settings.get()) ?? DEFAULT_SETTINGS;
+}
+
+export function useSpaceMap(): Map<string, Space> {
+  const list = useSpaces();
+  return new Map((list ?? []).map((s) => [s.id, s]));
+}
