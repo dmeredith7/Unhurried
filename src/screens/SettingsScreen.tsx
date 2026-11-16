@@ -1,9 +1,10 @@
 import { ChevronRight, Plus } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState, type ReactNode } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { SpaceEditor } from '../components/SpaceEditor';
 import { TaskEditor } from '../components/TaskEditor';
 import { DataCard } from '../components/DataCard';
+import { BreakIdeasEditor } from '../components/BreakIdeasEditor';
 import { Button, PageHeader, Segmented, Toggle, inputClass } from '../components/ui';
 import { useSettings, useSpaces, useTasks, useTemplates } from '../data/hooks';
 import * as repos from '../data/repos';
@@ -21,6 +22,10 @@ export function SettingsScreen() {
   const [editingTemplate, setEditingTemplate] = useState<Partial<Template> | null>(null);
 
   const set = repos.settings.update;
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start' });
+  }, [hash]);
 
   return (
     <>
@@ -130,6 +135,14 @@ export function SettingsScreen() {
         />
       </Card>
 
+      <Card
+        id="break-ideas"
+        title="Break ideas"
+        description="Rewards suggested after each focus block. Make them things you genuinely enjoy."
+      >
+        <BreakIdeasEditor />
+      </Card>
+
       <Card title="Appearance and calendar">
         <div className="space-y-4 py-2">
           <Segmented<ThemePref>
@@ -184,9 +197,19 @@ export function SettingsScreen() {
   );
 }
 
-function Card({ title, description, children }: { title: string; description?: string; children: ReactNode }) {
+function Card({
+  id,
+  title,
+  description,
+  children,
+}: {
+  id?: string;
+  title: string;
+  description?: string;
+  children: ReactNode;
+}) {
   return (
-    <section className="mb-6 rounded-3xl bg-surface p-5 shadow-[0_1px_0_var(--line)]">
+    <section id={id} className="mb-6 scroll-mt-20 rounded-3xl bg-surface p-5 shadow-[0_1px_0_var(--line)]">
       <h2 className="text-lg font-semibold">{title}</h2>
       {description && <p className="text-sm text-muted">{description}</p>}
       <div className="mt-2">{children}</div>

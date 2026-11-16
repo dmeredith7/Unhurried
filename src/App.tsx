@@ -7,6 +7,8 @@ import { ensureDefaults, isOnboarded } from './data/setup';
 import { GettingStarted } from './screens/GettingStarted';
 import { useApplyTheme } from './lib/theme';
 import { ComingSoon } from './screens/ComingSoon';
+import { FocusScreen } from './screens/FocusScreen';
+import { TimerProvider } from './components/TimerProvider';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { TasksScreen } from './screens/TasksScreen';
 import { TodayScreen } from './screens/TodayScreen';
@@ -28,6 +30,7 @@ export default function App() {
   if (!ready || onboarded === undefined) return null;
 
   return (
+    <TimerProvider>
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       {!onboarded ? (
         <GettingStarted />
@@ -37,14 +40,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route index element={<TodayScreen />} />
           <Route path="tasks" element={<TasksScreen />} />
-          <Route
-            path="focus"
-            element={
-              <ComingSoon title="Focus" phase={3}>
-                The focus timer, flow warm-up, block ratings and reward breaks live here.
-              </ComingSoon>
-            }
-          />
+          <Route path="focus" element={<FocusScreen />} />
           <Route
             path="week"
             element={
@@ -67,5 +63,6 @@ export default function App() {
       </Routes>
       )}
     </BrowserRouter>
+    </TimerProvider>
   );
 }

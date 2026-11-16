@@ -1,5 +1,7 @@
 import { CalendarDays, Flag, ListTodo, Settings, Sun, Timer } from 'lucide-react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { useTimer } from './TimerProvider';
+import * as T from '../domain/timer';
 
 const NAV = [
   { to: '/', label: 'Today', Icon: Sun, end: true },
@@ -10,6 +12,9 @@ const NAV = [
 ];
 
 export function Layout() {
+  const { session, now } = useTimer();
+  const { pathname } = useLocation();
+  const showPill = !!session && pathname !== '/focus';
   return (
     <div className="min-h-dvh md:flex">
       <a
@@ -78,6 +83,20 @@ export function Layout() {
       <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 pt-6 pb-28 md:px-10 md:pt-10 md:pb-12">
         <Outlet />
       </main>
+
+      {showPill && session && (
+        <Link
+          to="/focus"
+          className="fixed right-4 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-40 inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-sm font-medium text-bg shadow-lg md:bottom-6"
+        >
+          <span className={`size-2 rounded-full ${session.phase === 'review' ? 'bg-leisure-soft' : 'bg-accent-soft'}`} aria-hidden="true" />
+          {session.phase === 'review'
+            ? 'Block complete: rate it'
+            : `${T.formatClock(T.remainingMs(session, now))} ${
+                session.phase === 'warmup' ? 'warm-up' : T.isPaused(session) ? 'paused' : 'focus'
+              }`}
+        </Link>
+      )}
 
       {/* Mobile bottom tabs */}
       <nav

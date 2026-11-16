@@ -84,3 +84,17 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Warm-up breathing circle: 4s in, 4s out. */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(0.6);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
+.breathe {
+  animation: breathe 8s ease-in-out infinite;
+}

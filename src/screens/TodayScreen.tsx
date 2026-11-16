@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { TaskEditor, type TaskDraft } from '../components/TaskEditor';
 import { TaskRow } from '../components/TaskRow';
 import { Button, EmptyState, PageHeader, inputClass } from '../components/ui';
-import { useSettings, useSpaceMap, useSpaces, useTasks } from '../data/hooks';
+import { useBlocks, useSettings, useSpaceMap, useSpaces, useTasks } from '../data/hooks';
 import * as repos from '../data/repos';
 import type { Task } from '../data/types';
 import { friendlyToday, todayISO, toISODate } from '../lib/dates';
@@ -24,6 +24,8 @@ export function TodayScreen() {
   const [editing, setEditing] = useState<TaskDraft | null>(null);
   const [quick, setQuick] = useState('');
   const today = todayISO();
+  const blocksToday = (useBlocks() ?? []).filter((b) => toISODate(new Date(b.startedAt)) === today);
+  const focusMinutes = blocksToday.reduce((n, b) => n + b.actualMinutes, 0);
 
   const { forToday, stillOnList, doneToday } = useMemo(() => {
     const all = tasks ?? [];
@@ -58,10 +60,23 @@ export function TodayScreen() {
         className="mb-8 flex flex-col gap-4 rounded-3xl bg-accent-soft p-5 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <p className="text-lg font-medium">When can you start?</p>
-          <p className="text-sm text-muted">
-            One {settings.blockMinutes}-minute block is enough. You don't have to finish, just begin.
-          </p>
+          {blocksToday.length > 0 ? (
+            <>
+              <p className="text-lg font-medium">
+                {blocksToday.length} {blocksToday.length === 1 ? 'block' : 'blocks'} today,{' '}
+                {focusMinutes < 60 ? `${focusMinutes} min` : `${(focusMinutes / 60).toFixed(1).replace(/\.0$/, '')} h`} of
+                focus
+              </p>
+              <p className="text-sm text-muted">That's real progress. Another block, or a well-earned break?</p>
+            </>
+          ) : (
+            <>
+              <p className="text-lg font-medium">When can you start?</p>
+              <p className="text-sm text-muted">
+                One {settings.blockMinutes}-minute block is enough. You don't have to finish, just begin.
+              </p>
+            </>
+          )}
         </div>
         <Link
           to="/focus"

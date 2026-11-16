@@ -28,3 +28,11 @@ export function useTemplates(): Template[] | undefined {
     (await repos.templates.list()).sort((a, b) => a.name.localeCompare(b.name)),
   );
 }
+
+export function useBlocks(): import('./types').WorkBlock[] | undefined {
+  return useLiveQuery(async () => (await repos.blocks.list()).sort((a, b) => b.startedAt - a.startedAt));
+}
+
+export function useBreakIdeas(): import('./types').BreakIdea[] | undefined {
+  return useLiveQuery(async () => (await repos.breakIdeas.list()).sort((a, b) => a.order - b.order));
+}
