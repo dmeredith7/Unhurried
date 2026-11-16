@@ -22,7 +22,7 @@ export function Layout() {
       {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-line bg-surface px-3 py-6 md:flex">
         <div className="mb-8 flex items-center gap-2 px-3">
-          <img src="/icon.svg" alt="" className="size-7" />
+          <img src={`${import.meta.env.BASE_URL}icon.svg`} alt="" className="size-7" />
           <span className="text-lg font-semibold tracking-tight">Unhurried</span>
         </div>
         <nav aria-label="Main" className="flex flex-1 flex-col gap-1">
@@ -59,7 +59,7 @@ export function Layout() {
       {/* Mobile top bar */}
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-bg/90 px-4 pt-[env(safe-area-inset-top)] backdrop-blur md:hidden">
         <div className="flex h-14 items-center gap-2">
-          <img src="/icon.svg" alt="" className="size-6" />
+          <img src={`${import.meta.env.BASE_URL}icon.svg`} alt="" className="size-6" />
           <span className="font-semibold tracking-tight">Unhurried</span>
         </div>
         <NavLink
