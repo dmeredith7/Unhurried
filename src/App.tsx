@@ -6,7 +6,7 @@ import { useSettings } from './data/hooks';
 import { ensureDefaults, isOnboarded } from './data/setup';
 import { GettingStarted } from './screens/GettingStarted';
 import { useApplyTheme } from './lib/theme';
-import { ComingSoon } from './screens/ComingSoon';
+import { GoalDetailScreen, GoalsScreen } from './screens/GoalsScreen';
 import { FocusScreen } from './screens/FocusScreen';
 import { ScheduleScreen } from './screens/ScheduleScreen';
 import { TimerProvider } from './components/TimerProvider';
@@ -43,14 +43,8 @@ export default function App() {
           <Route path="tasks" element={<TasksScreen />} />
           <Route path="focus" element={<FocusScreen />} />
           <Route path="week" element={<ScheduleScreen />} />
-          <Route
-            path="goals"
-            element={
-              <ComingSoon title="Goals" phase={5}>
-                Work backward from a deadline to a small first step you can take today.
-              </ComingSoon>
-            }
-          />
+          <Route path="goals" element={<GoalsScreen />} />
+          <Route path="goals/:id" element={<GoalDetailScreen />} />
           <Route path="settings" element={<SettingsScreen />} />
           <Route path="*" element={<TodayScreen />} />
         </Route>

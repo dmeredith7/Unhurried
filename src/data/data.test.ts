@@ -86,3 +86,29 @@ describe('schedule scopes', async () => {
     expect(await week('2026-11-30')).toHaveLength(0);
   });
 });
+
+describe('goals', async () => {
+  const { createGoalPlan, deleteGoal } = await import('./goals');
+  it('creates milestones and a first step as linked tasks, and deletes them together', async () => {
+    const s = await repos.spaces.create({ name: 'Side', color: 'sage', icon: 'rocket', order: 0, fields: [] });
+    const goal = await createGoalPlan({
+      title: 'Launch the newsletter',
+      notes: '',
+      deadline: '2027-01-31',
+      spaceId: s.id,
+      milestones: [
+        { title: 'Pick a name', date: '2026-12-01' },
+        { title: 'First issue sent', date: '2027-01-31' },
+      ],
+      firstStep: { title: 'List five name ideas', today: true },
+    });
+    const tasks = (await repos.tasks.list()).filter((t) => t.goalId === goal.id);
+    expect(tasks.filter((t) => t.kind === 'milestone').map((t) => t.title)).toEqual(['Pick a name', 'First issue sent']);
+    const step = tasks.find((t) => t.kind === 'step')!;
+    expect(step.parentId).toBe(tasks.find((t) => t.title === 'Pick a name')!.id);
+    expect(step.plannedFor).toBeTruthy();
+    await deleteGoal(goal);
+    expect(await repos.tasks.list()).toHaveLength(0);
+    expect(await repos.goals.list()).toHaveLength(0);
+  });
+});

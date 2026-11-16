@@ -43,3 +43,7 @@ export function useScheduleData() {
     overrides: await repos.scheduleOverrides.list(),
   }));
 }
+
+export function useGoals(): import('./types').Goal[] | undefined {
+  return useLiveQuery(async () => (await repos.goals.list()).sort((a, b) => a.deadline.localeCompare(b.deadline)));
+}
