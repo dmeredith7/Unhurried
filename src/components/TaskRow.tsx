@@ -47,8 +47,8 @@ export function TaskRow({
         type="button"
         onClick={() => onOpen(task)}
         className="min-w-0 flex-1 text-left"
-        aria-label={`Edit "${task.title}"`}
       >
+        <span className="sr-only">Edit: </span>
         <span className={`block text-[15px] leading-snug ${done ? 'text-muted line-through' : ''}`}>
           {task.title}
         </span>

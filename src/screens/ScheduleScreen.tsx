@@ -148,6 +148,9 @@ export function ScheduleScreen() {
 
       <div
         ref={scrollRef}
+        tabIndex={0}
+        role="region"
+        aria-label="Week grid. Use the arrow keys to scroll."
         className="relative max-h-[65dvh] overflow-y-auto rounded-2xl border border-line bg-surface"
       >
         <div className="sticky top-0 z-20 hidden grid-cols-[3.5rem_repeat(7,1fr)] border-b border-line bg-surface md:grid">

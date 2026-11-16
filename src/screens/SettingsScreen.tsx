@@ -41,8 +41,8 @@ export function SettingsScreen() {
                   type="button"
                   onClick={() => setEditing(s)}
                   className="flex w-full items-center gap-3 py-3 text-left"
-                  aria-label={`Edit space ${s.name}`}
                 >
+                  <span className="sr-only">Edit space</span>
                   <SpaceBadge color={s.color} icon={s.icon} />
                   <span className="flex-1">
                     <span className="block font-medium">{s.name}</span>
@@ -71,8 +71,8 @@ export function SettingsScreen() {
                   type="button"
                   onClick={() => setEditingTemplate(t)}
                   className="flex w-full items-center gap-3 py-3 text-left"
-                  aria-label={`Edit template ${t.name}`}
                 >
+                  <span className="sr-only">Edit template</span>
                   <span className="flex-1">
                     <span className="block font-medium">{t.name}</span>
                     <span className="text-sm text-muted">
