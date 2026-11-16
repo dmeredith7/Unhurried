@@ -1,9 +1,11 @@
-import { Check, Play, Sun, SunDim } from 'lucide-react';
+import { Check, ListChecks, Play, Repeat, Sun, SunDim } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import * as repos from '../data/repos';
 import type { Space, Task } from '../data/types';
 import { dueLabel, isPast, todayISO } from '../lib/dates';
 import { SpaceBadge } from '../lib/spaceStyle';
+import { describeRecurrence } from '../domain/recurrence';
+import { formatCustomValue } from './taskFields';
 
 function friendlyDue(due: string, today: string): string {
   const label = dueLabel(due, today);
@@ -67,6 +69,23 @@ export function TaskRow({
           <span>
             {task.estimateBlocks} {task.estimateBlocks === 1 ? 'block' : 'blocks'}
           </span>
+          {task.subtasks.length > 0 && (
+            <span className="inline-flex items-center gap-1">
+              <ListChecks className="size-3.5" aria-hidden="true" />
+              <span className="sr-only">Steps:</span>
+              {task.subtasks.filter((x) => x.done).length}/{task.subtasks.length}
+            </span>
+          )}
+          {task.recurrence && (
+            <span className="inline-flex items-center gap-1">
+              <Repeat className="size-3.5" aria-hidden="true" />
+              {describeRecurrence(task.recurrence)}
+            </span>
+          )}
+          {space?.fields.map((f) => {
+            const text = formatCustomValue(f, task.customValues[f.id]);
+            return text ? <span key={f.id}>{text}</span> : null;
+          })}
           {task.priority === 'high' && !done && (
             <span className="rounded-full bg-accent-soft px-2 py-0.5 text-ink">Priority</span>
           )}

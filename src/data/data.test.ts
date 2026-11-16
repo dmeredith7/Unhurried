@@ -40,7 +40,8 @@ describe('sample data', () => {
     await clearSampleData();
     expect(await hasSampleData()).toBe(false);
     const spaces = await repos.spaces.list();
-    expect(spaces.map((s) => s.name)).toEqual(['Work']); // kept because it holds my task
+    expect(spaces.map((s) => s.name)).toEqual(['Work']);
+    expect(await repos.templates.list()).toHaveLength(0); // kept because it holds my task
     expect((await repos.tasks.list()).map((t) => t.id)).toEqual([mine.id]);
   });
 });

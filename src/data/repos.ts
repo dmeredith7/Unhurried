@@ -9,6 +9,8 @@
 import type { Table } from 'dexie';
 import { db } from './db';
 import { newId } from '../lib/ids';
+import { todayISO } from '../lib/dates';
+import { nextOccurrence } from '../domain/recurrence';
 import {
   DEFAULT_SETTINGS,
   type BaseRecord,
@@ -130,11 +132,46 @@ export function blankTask(spaceId: string): NewRecord<Task> {
   };
 }
 
-export async function setTaskDone(task: Task, done: boolean): Promise<void> {
-  await tasks.update(task.id, {
-    status: done ? 'done' : 'open',
-    completedAt: done ? Date.now() : null,
+/**
+ * Mark a task done or not done. Completing a recurring task creates its next
+ * occurrence; undoing that completion removes the occurrence again if it
+ * hasn't been touched, so a mis-tap never leaves duplicates behind.
+ */
+export async function setTaskDone(task: Task, done: boolean, today: string = todayISO()): Promise<void> {
+  await transaction(async () => {
+    if (done) {
+      let spawnedId: string | null = null;
+      if (task.recurrence) {
+        const next = await tasks.create({
+          ...stripRecord(task),
+          dueDate: nextOccurrence(task.recurrence, { dueDate: task.dueDate, completedOn: today }),
+          subtasks: task.subtasks.map((s) => ({ ...s, id: newId(), done: false })),
+          status: 'open',
+          completedAt: null,
+          spawnedId: null,
+          plannedFor: null,
+          sample: task.sample,
+        });
+        spawnedId = next.id;
+      }
+      await tasks.update(task.id, { status: 'done', completedAt: Date.now(), spawnedId });
+    } else {
+      if (task.spawnedId) {
+        const spawned = await tasks.get(task.spawnedId);
+        if (spawned && spawned.status === 'open' && spawned.updatedAt === spawned.createdAt) {
+          await tasks.remove(spawned.id);
+        }
+      }
+      await tasks.update(task.id, { status: 'open', completedAt: null, spawnedId: null });
+    }
   });
+}
+
+/** Drop the BaseRecord bookkeeping fields so a record can be copied. */
+function stripRecord<T extends BaseRecord>(r: T): Omit<T, keyof BaseRecord> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id, createdAt, updatedAt, deletedAt, sample, ...rest } = r;
+  return rest;
 }
 
 /**

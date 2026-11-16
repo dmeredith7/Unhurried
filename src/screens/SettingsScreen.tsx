@@ -2,11 +2,13 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { ChevronRight, Plus } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { SpaceEditor } from '../components/SpaceEditor';
+import { TaskEditor } from '../components/TaskEditor';
+import { DataCard } from '../components/DataCard';
 import { Button, PageHeader, Segmented, Toggle, inputClass } from '../components/ui';
-import { useSettings, useSpaces, useTasks } from '../data/hooks';
+import { useSettings, useSpaces, useTasks, useTemplates } from '../data/hooks';
 import * as repos from '../data/repos';
 import { clearSampleData, hasSampleData } from '../data/seed';
-import type { Space, ThemePref } from '../data/types';
+import type { Space, Template, ThemePref } from '../data/types';
 import { SpaceBadge } from '../lib/spaceStyle';
 
 const BLOCK_OPTIONS = [15, 20, 25, 30, 45, 50, 60, 90];
@@ -17,6 +19,8 @@ export function SettingsScreen() {
   const tasks = useTasks() ?? [];
   const sample = useLiveQuery(() => hasSampleData(), []);
   const [editing, setEditing] = useState<Space | null | 'new'>(null);
+  const templates = useTemplates() ?? [];
+  const [editingTemplate, setEditingTemplate] = useState<Partial<Template> | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);
   const [cleared, setCleared] = useState(false);
 
@@ -54,6 +58,35 @@ export function SettingsScreen() {
         <Button className="mt-3" onClick={() => setEditing('new')}>
           <Plus className="size-4" aria-hidden="true" />
           New space
+        </Button>
+      </Card>
+
+      <Card title="Templates" description="Reusable tasks with preset steps, like a weekly clean.">
+        {templates.length > 0 && (
+          <ul className="divide-y divide-line">
+            {templates.map((t) => (
+              <li key={t.id}>
+                <button
+                  type="button"
+                  onClick={() => setEditingTemplate(t)}
+                  className="flex w-full items-center gap-3 py-3 text-left"
+                  aria-label={`Edit template ${t.name}`}
+                >
+                  <span className="flex-1">
+                    <span className="block font-medium">{t.name}</span>
+                    <span className="text-sm text-muted">
+                      {t.subtasks.length} {t.subtasks.length === 1 ? 'step' : 'steps'}
+                    </span>
+                  </span>
+                  <ChevronRight className="size-5 text-muted" aria-hidden="true" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <Button className="mt-3" onClick={() => setEditingTemplate({})}>
+          <Plus className="size-4" aria-hidden="true" />
+          New template
         </Button>
       </Card>
 
@@ -125,6 +158,10 @@ export function SettingsScreen() {
         </div>
       </Card>
 
+      <Card title="Your data" description="Everything is stored privately in this browser on this device.">
+        <DataCard />
+      </Card>
+
       {(sample || cleared) && (
         <Card title="Sample setup">
           {cleared ? (
@@ -160,6 +197,13 @@ export function SettingsScreen() {
           )}
         </Card>
       )}
+
+      <TaskEditor
+        mode="template"
+        open={editingTemplate !== null}
+        template={editingTemplate}
+        onClose={() => setEditingTemplate(null)}
+      />
 
       <SpaceEditor
         open={editing !== null}

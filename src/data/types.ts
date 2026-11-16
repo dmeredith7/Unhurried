@@ -58,6 +58,8 @@ export interface Recurrence {
   weekdays?: number[];
   /** Whether the next date counts from the due date or from completion. */
   from: 'due' | 'completion';
+  /** For monthly: the day to aim for (keeps the 31st from drifting to the 28th). */
+  dayOfMonth?: number;
 }
 
 export type TaskKind = 'task' | 'milestone' | 'step';
@@ -79,6 +81,8 @@ export interface Task extends BaseRecord {
   recurrence?: Recurrence | null;
   status: 'open' | 'done';
   completedAt?: number | null;
+  /** For a completed recurring task: the next occurrence it created. */
+  spawnedId?: string | null;
   /** Date (YYYY-MM-DD) the user chose to work on this; shows in Today. */
   plannedFor?: string | null;
   // Reverse-calendar links (phase 5)

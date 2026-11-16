@@ -1,6 +1,6 @@
 import { db } from './db';
 import * as repos from './repos';
-import { addDays, todayISO } from '../lib/dates';
+import { addDays, parseISODate, todayISO } from '../lib/dates';
 
 const SEEDED_KEY = 'seeded';
 
@@ -46,6 +46,10 @@ async function insertSample() {
     ...base(work.id),
     title: 'Outline the quarterly report',
     notes: 'Just the headings and a few bullet points. A rough start counts.',
+    subtasks: [
+      { id: 's1', title: 'List the main sections', done: false },
+      { id: 's2', title: 'Jot one bullet under each', done: false },
+    ],
     estimateBlocks: 2,
     priority: 'high',
     tags: ['writing'],
@@ -82,6 +86,26 @@ async function insertSample() {
     estimateBlocks: 1,
     tags: ['admin'],
     dueDate: addDays(today, -2),
+  });
+  await repos.tasks.create({
+    ...base(home.id),
+    title: 'Take out the bins',
+    estimateBlocks: 1,
+    priority: 'low',
+    dueDate: addDays(today, 1),
+    recurrence: { freq: 'weekly', interval: 1, from: 'due', weekdays: [parseISODate(addDays(today, 1)).getDay()] },
+  });
+  await repos.templates.create({
+    name: 'Weekly clean',
+    spaceId: home.id,
+    title: 'Weekly clean',
+    notes: 'Put on some music. Do as much as feels good.',
+    estimateBlocks: 2,
+    priority: 'normal',
+    tags: ['chores'],
+    subtasks: ['Tidy surfaces', 'Vacuum', 'Wipe the kitchen', 'Clean the bathroom', 'Change the bedsheets'],
+    recurrence: null,
+    sample: true,
   });
   await repos.tasks.create({
     ...base(home.id),

@@ -1,10 +1,10 @@
-import { Plus, Search } from 'lucide-react';
+import { LayoutTemplate, Plus, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { TaskEditor, type TaskDraft } from '../components/TaskEditor';
+import { TaskEditor, draftFromTemplate, type TaskDraft } from '../components/TaskEditor';
 import { TaskRow } from '../components/TaskRow';
-import { Button, Chip, EmptyState, PageHeader, inputClass } from '../components/ui';
-import { useSpaceMap, useSpaces, useTasks } from '../data/hooks';
+import { Button, Chip, EmptyState, PageHeader, Sheet, inputClass } from '../components/ui';
+import { useSpaceMap, useSpaces, useTasks, useTemplates } from '../data/hooks';
 import type { Priority } from '../data/types';
 import { spaceHex } from '../lib/spaceStyle';
 import { sortTasks } from '../lib/taskSort';
@@ -15,6 +15,8 @@ export function TasksScreen() {
   const spaceMap = useSpaceMap();
   const [params, setParams] = useSearchParams();
   const [editing, setEditing] = useState<TaskDraft | null>(null);
+  const [picking, setPicking] = useState(false);
+  const templates = useTemplates() ?? [];
 
   const spaceFilter = params.get('space');
   const tagFilter = params.get('tag');
@@ -56,6 +58,14 @@ export function TasksScreen() {
       <PageHeader
         title="Tasks"
         actions={
+          <>
+          {templates.length > 0 && (
+            <Button onClick={() => setPicking(true)} disabled={spaces.length === 0}>
+              <LayoutTemplate className="size-5" aria-hidden="true" />
+              <span className="hidden sm:inline">From template</span>
+              <span className="sr-only sm:hidden">New task from template</span>
+            </Button>
+          )}
           <Button
             variant="primary"
             onClick={() => setEditing({ spaceId: spaceFilter ?? undefined })}
@@ -65,6 +75,7 @@ export function TasksScreen() {
             <span className="hidden sm:inline">New task</span>
             <span className="sr-only sm:hidden">New task</span>
           </Button>
+          </>
         }
       />
 
@@ -177,6 +188,34 @@ export function TasksScreen() {
       )}
 
       <TaskEditor open={!!editing} task={editing} onClose={() => setEditing(null)} />
+
+      <Sheet open={picking} onClose={() => setPicking(false)} title="Start from a template">
+        <ul className="space-y-2 pb-2">
+          {templates.map((t) => (
+            <li key={t.id}>
+              <button
+                type="button"
+                className="w-full rounded-2xl bg-surface-2 px-4 py-3 text-left hover:bg-line"
+                onClick={() => {
+                  setPicking(false);
+                  const draft = draftFromTemplate(t);
+                  setEditing({ ...draft, spaceId: draft.spaceId ?? spaceFilter ?? undefined });
+                }}
+              >
+                <span className="block font-medium">{t.name}</span>
+                <span className="text-sm text-muted">
+                  {[
+                    t.subtasks.length ? `${t.subtasks.length} steps` : null,
+                    t.spaceId ? spaceMap.get(t.spaceId)?.name : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ') || 'Blank template'}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </Sheet>
     </>
   );
 }

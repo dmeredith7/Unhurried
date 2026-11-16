@@ -1,10 +1,11 @@
-import { Check } from 'lucide-react';
+import { Check, Plus, X } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useSpaces, useTasks } from '../data/hooks';
 import * as repos from '../data/repos';
-import type { Space, SpaceColor } from '../data/types';
+import type { CustomFieldDef, CustomFieldType, Space, SpaceColor } from '../data/types';
+import { newId } from '../lib/ids';
 import { SPACE_COLORS, SPACE_ICONS, SpaceBadge } from '../lib/spaceStyle';
-import { Button, Field, Sheet, inputClass } from './ui';
+import { Button, Field, IconButton, Sheet, inputClass } from './ui';
 
 export function SpaceEditor({
   open,
@@ -20,6 +21,7 @@ export function SpaceEditor({
   const [name, setName] = useState('');
   const [color, setColor] = useState<SpaceColor>('sage');
   const [icon, setIcon] = useState('sparkles');
+  const [fields, setFields] = useState<CustomFieldDef[]>([]);
   const [deleting, setDeleting] = useState(false);
   const [moveTo, setMoveTo] = useState('');
 
@@ -28,6 +30,7 @@ export function SpaceEditor({
     setName(space?.name ?? '');
     setColor(space?.color ?? 'sage');
     setIcon(space?.icon ?? 'sparkles');
+    setFields(space?.fields ?? []);
     setDeleting(false);
     setMoveTo('');
   }, [open, space]);
@@ -38,15 +41,22 @@ export function SpaceEditor({
   async function save(e: FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
+    const cleanFields = fields
+      .filter((f) => f.name.trim())
+      .map((f) => ({
+        ...f,
+        name: f.name.trim(),
+        options: f.type === 'select' ? (f.options ?? []).map((o) => o.trim()).filter(Boolean) : undefined,
+      }));
     if (space) {
-      await repos.spaces.update(space.id, { name: name.trim(), color, icon });
+      await repos.spaces.update(space.id, { name: name.trim(), color, icon, fields: cleanFields });
     } else {
       await repos.spaces.create({
         name: name.trim(),
         color,
         icon,
         order: Math.max(-1, ...spaces.map((s) => s.order)) + 1,
-        fields: [],
+        fields: cleanFields,
       });
     }
     onClose();
@@ -195,8 +205,84 @@ export function SpaceEditor({
               ))}
             </div>
           </fieldset>
+
+          <CustomFieldDefs value={fields} onChange={setFields} />
         </form>
       )}
     </Sheet>
+  );
+}
+
+const FIELD_TYPES: { value: CustomFieldType; label: string }[] = [
+  { value: 'text', label: 'Text' },
+  { value: 'number', label: 'Number' },
+  { value: 'select', label: 'Choice list' },
+  { value: 'date', label: 'Date' },
+  { value: 'checkbox', label: 'Yes / no' },
+];
+
+function CustomFieldDefs({
+  value,
+  onChange,
+}: {
+  value: CustomFieldDef[];
+  onChange: (v: CustomFieldDef[]) => void;
+}) {
+  const update = (id: string, patch: Partial<CustomFieldDef>) =>
+    onChange(value.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+  return (
+    <fieldset className="space-y-2">
+      <legend className="text-sm font-medium">Custom fields</legend>
+      <p className="text-xs text-muted">
+        Extra details for tasks in this space, like "Client" for work or "Room" for home.
+      </p>
+      {value.map((f, i) => (
+        <div key={f.id} className="space-y-2 rounded-2xl bg-surface-2 p-3">
+          <div className="flex gap-2">
+            <input
+              className={inputClass}
+              value={f.name}
+              placeholder="Field name"
+              aria-label={`Field ${i + 1} name`}
+              onChange={(e) => update(f.id, { name: e.target.value })}
+            />
+            <select
+              className={`${inputClass} !w-auto`}
+              value={f.type}
+              aria-label={`Field ${i + 1} type`}
+              onChange={(e) => update(f.id, { type: e.target.value as CustomFieldType })}
+            >
+              {FIELD_TYPES.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+            <IconButton
+              label={`Remove field ${f.name || i + 1}`}
+              onClick={() => onChange(value.filter((x) => x.id !== f.id))}
+            >
+              <X className="size-4" aria-hidden="true" />
+            </IconButton>
+          </div>
+          {f.type === 'select' && (
+            <input
+              className={inputClass}
+              placeholder="Choices, separated by commas"
+              aria-label={`Field ${i + 1} choices`}
+              value={(f.options ?? []).join(', ')}
+              onChange={(e) => update(f.id, { options: e.target.value.split(',').map((o) => o.trimStart()) })}
+            />
+          )}
+        </div>
+      ))}
+      <Button
+        size="sm"
+        onClick={() => onChange([...value, { id: newId(), name: '', type: 'text' }])}
+      >
+        <Plus className="size-4" aria-hidden="true" />
+        Add field
+      </Button>
+    </fieldset>
   );
 }
