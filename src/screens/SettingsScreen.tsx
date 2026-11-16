@@ -1,13 +1,12 @@
-import { useLiveQuery } from 'dexie-react-hooks';
 import { ChevronRight, Plus } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { SpaceEditor } from '../components/SpaceEditor';
 import { TaskEditor } from '../components/TaskEditor';
 import { DataCard } from '../components/DataCard';
 import { Button, PageHeader, Segmented, Toggle, inputClass } from '../components/ui';
 import { useSettings, useSpaces, useTasks, useTemplates } from '../data/hooks';
 import * as repos from '../data/repos';
-import { clearSampleData, hasSampleData } from '../data/seed';
 import type { Space, Template, ThemePref } from '../data/types';
 import { SpaceBadge } from '../lib/spaceStyle';
 
@@ -17,12 +16,9 @@ export function SettingsScreen() {
   const settings = useSettings();
   const spaces = useSpaces() ?? [];
   const tasks = useTasks() ?? [];
-  const sample = useLiveQuery(() => hasSampleData(), []);
   const [editing, setEditing] = useState<Space | null | 'new'>(null);
   const templates = useTemplates() ?? [];
   const [editingTemplate, setEditingTemplate] = useState<Partial<Template> | null>(null);
-  const [confirmClear, setConfirmClear] = useState(false);
-  const [cleared, setCleared] = useState(false);
 
   const set = repos.settings.update;
 
@@ -162,41 +158,15 @@ export function SettingsScreen() {
         <DataCard />
       </Card>
 
-      {(sample || cleared) && (
-        <Card title="Sample setup">
-          {cleared ? (
-            <p className="py-2 text-muted" role="status">
-              Sample data cleared. The space is all yours.
-            </p>
-          ) : (
-            <>
-              <p className="py-2 text-sm text-muted">
-                The app started with example spaces and tasks. Clearing removes them. Anything you
-                created yourself stays, including tasks you added to a sample space.
-              </p>
-              {confirmClear ? (
-                <div className="flex gap-2">
-                  <Button
-                    variant="primary"
-                    onClick={async () => {
-                      await clearSampleData();
-                      setConfirmClear(false);
-                      setCleared(true);
-                    }}
-                  >
-                    Clear sample data
-                  </Button>
-                  <Button variant="ghost" onClick={() => setConfirmClear(false)}>
-                    Cancel
-                  </Button>
-                </div>
-              ) : (
-                <Button onClick={() => setConfirmClear(true)}>Clear sample data</Button>
-              )}
-            </>
-          )}
-        </Card>
-      )}
+      <Card title="Help">
+        <Link
+          to="/welcome"
+          className="flex items-center justify-between py-3 font-medium"
+        >
+          Getting started guide
+          <ChevronRight className="size-5 text-muted" aria-hidden="true" />
+        </Link>
+      </Card>
 
       <TaskEditor
         mode="template"

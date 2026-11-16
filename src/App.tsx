@@ -1,8 +1,10 @@
+import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { useSettings } from './data/hooks';
-import { seedIfFirstRun } from './data/seed';
+import { ensureDefaults, isOnboarded } from './data/setup';
+import { GettingStarted } from './screens/GettingStarted';
 import { useApplyTheme } from './lib/theme';
 import { ComingSoon } from './screens/ComingSoon';
 import { SettingsScreen } from './screens/SettingsScreen';
@@ -13,20 +15,25 @@ export default function App() {
   const settings = useSettings();
   useApplyTheme(settings.theme);
   const [ready, setReady] = useState(false);
+  const onboarded = useLiveQuery(() => isOnboarded(), []);
 
   useEffect(() => {
-    seedIfFirstRun()
-      .catch((e) => console.error('Could not set up sample data', e))
+    ensureDefaults()
+      .catch((e) => console.error('Could not set up defaults', e))
       .finally(() => setReady(true));
     // Ask the browser to keep our storage even under pressure (best effort).
     navigator.storage?.persist?.().catch(() => {});
   }, []);
 
-  if (!ready) return null;
+  if (!ready || onboarded === undefined) return null;
 
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
+      {!onboarded ? (
+        <GettingStarted />
+      ) : (
       <Routes>
+        <Route path="welcome" element={<GettingStarted revisit />} />
         <Route element={<Layout />}>
           <Route index element={<TodayScreen />} />
           <Route path="tasks" element={<TasksScreen />} />
@@ -58,6 +65,7 @@ export default function App() {
           <Route path="*" element={<TodayScreen />} />
         </Route>
       </Routes>
+      )}
     </BrowserRouter>
   );
 }

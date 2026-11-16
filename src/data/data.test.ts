@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { db } from './db';
 import * as repos from './repos';
-import { clearSampleData, hasSampleData, seedIfFirstRun } from './seed';
+import { completeOnboarding, ensureDefaults, isOnboarded } from './setup';
 
 beforeEach(async () => {
   await db.delete();
@@ -26,22 +26,29 @@ describe('repositories', () => {
   });
 });
 
-describe('sample data', () => {
-  it('seeds only once', async () => {
-    await seedIfFirstRun();
-    await seedIfFirstRun();
-    expect(await repos.spaces.list()).toHaveLength(2);
+describe('first-run setup', () => {
+  it('adds default break ideas once and no sample tasks', async () => {
+    await ensureDefaults();
+    await ensureDefaults();
+    expect((await repos.breakIdeas.list()).length).toBe(8);
+    expect(await repos.tasks.list()).toHaveLength(0);
+    expect(await isOnboarded()).toBe(false);
   });
 
-  it('clears samples but keeps the user’s own work', async () => {
-    await seedIfFirstRun();
-    const [work] = (await repos.spaces.list()).sort((x, y) => x.order - y.order);
-    const mine = await repos.tasks.create({ ...repos.blankTask(work.id), title: 'My own task' });
-    await clearSampleData();
-    expect(await hasSampleData()).toBe(false);
-    const spaces = await repos.spaces.list();
-    expect(spaces.map((s) => s.name)).toEqual(['Work']);
-    expect(await repos.templates.list()).toHaveLength(0); // kept because it holds my task
-    expect((await repos.tasks.list()).map((t) => t.id)).toEqual([mine.id]);
+  it('creates chosen spaces and a first task for today', async () => {
+    await completeOnboarding({ spaceKeys: ['work', 'errands'], customSpace: 'Garden', firstTask: 'Write one sentence' });
+    const spaces = (await repos.spaces.list()).sort((a, b) => a.order - b.order);
+    expect(spaces.map((s) => s.name)).toEqual(['Work', 'Errands', 'Garden']);
+    expect(spaces[0].fields.map((f) => f.name)).toEqual(['Client']);
+    const [task] = await repos.tasks.list();
+    expect(task.title).toBe('Write one sentence');
+    expect(task.spaceId).toBe(spaces[0].id);
+    expect(task.plannedFor).toBeTruthy();
+    expect(await isOnboarded()).toBe(true);
+  });
+
+  it('always leaves at least one space', async () => {
+    await completeOnboarding({ spaceKeys: [] });
+    expect((await repos.spaces.list()).map((s) => s.name)).toEqual(['Personal']);
   });
 });

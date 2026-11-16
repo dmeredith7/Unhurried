@@ -9,8 +9,6 @@ export interface BaseRecord {
   updatedAt: number; // epoch ms
   /** Soft-delete marker (epoch ms). Kept so deletions can sync later. */
   deletedAt?: number | null;
-  /** True for records created by the sample setup. */
-  sample?: boolean;
 }
 
 export type SpaceColor =

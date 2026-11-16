@@ -98,9 +98,9 @@ export async function importBackup(b: Backup, mode: 'replace' | 'merge'): Promis
         await db.settings.put(b.data.settings[0]);
       }
     }
-    // Never re-seed sample data after an import.
+    // An imported backup is an existing setup: skip the getting-started guide.
     await db.meta.bulkPut(b.data.meta);
-    await db.meta.put({ key: 'seeded', value: true });
+    await db.meta.put({ key: 'onboarded', value: true });
   });
 }
 

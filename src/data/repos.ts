@@ -26,7 +26,7 @@ import {
 } from './types';
 
 export type NewRecord<T extends BaseRecord> = Omit<T, keyof BaseRecord> &
-  Partial<Pick<BaseRecord, 'id' | 'sample'>>;
+  Partial<Pick<BaseRecord, 'id'>>;
 
 export interface Repo<T extends BaseRecord> {
   /** All records that are not soft-deleted. */
@@ -150,7 +150,6 @@ export async function setTaskDone(task: Task, done: boolean, today: string = tod
           completedAt: null,
           spawnedId: null,
           plannedFor: null,
-          sample: task.sample,
         });
         spawnedId = next.id;
       }
@@ -170,7 +169,7 @@ export async function setTaskDone(task: Task, done: boolean, today: string = tod
 /** Drop the BaseRecord bookkeeping fields so a record can be copied. */
 function stripRecord<T extends BaseRecord>(r: T): Omit<T, keyof BaseRecord> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id, createdAt, updatedAt, deletedAt, sample, ...rest } = r;
+  const { id, createdAt, updatedAt, deletedAt, ...rest } = r;
   return rest;
 }
 
