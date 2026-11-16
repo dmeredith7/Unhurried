@@ -16,7 +16,7 @@ import type {
  * The local IndexedDB database. Only the repository layer (repos.ts) should
  * import this directly; screens and components go through repos/hooks.
  */
-export class NowHabitDB extends Dexie {
+export class UnhurriedDB extends Dexie {
   spaces!: Table<Space, string>;
   tasks!: Table<Task, string>;
   templates!: Table<Template, string>;
@@ -28,7 +28,7 @@ export class NowHabitDB extends Dexie {
   settings!: Table<Settings, string>;
   meta!: Table<Meta, string>;
 
-  constructor(name = 'now-habit') {
+  constructor(name = 'unhurried') {
     super(name);
     this.version(1).stores({
       spaces: 'id, order, updatedAt',
@@ -45,7 +45,7 @@ export class NowHabitDB extends Dexie {
   }
 }
 
-export const db = new NowHabitDB();
+export const db = new UnhurriedDB();
 
 /** Names of the tables that hold syncable records (used by export/import). */
 export const RECORD_TABLES = [
