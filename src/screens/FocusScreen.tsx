@@ -18,7 +18,9 @@ export const QUALITY_LABELS = ['Scattered', 'Some focus', 'Steady', 'Good flow',
 export function FocusScreen() {
   const { session, lastBlock } = useTimer();
   const stage = session?.phase ?? (lastBlock ? 'break' : 'setup');
-  useEffect(() => window.scrollTo(0, 0), [stage]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [stage]);
   if (session?.phase === 'warmup') return <WarmUp />;
   if (session?.phase === 'focus') return <Focusing />;
   if (session?.phase === 'review') return <Review />;
@@ -41,8 +43,12 @@ function Setup() {
   const today = todayISO();
 
   // Settings load asynchronously; adopt them once they arrive.
-  useEffect(() => setMinutes(settings.blockMinutes), [settings.blockMinutes]);
-  useEffect(() => setWarmUp(settings.warmUp), [settings.warmUp]);
+  useEffect(() => {
+    setMinutes(settings.blockMinutes);
+  }, [settings.blockMinutes]);
+  useEffect(() => {
+    setWarmUp(settings.warmUp);
+  }, [settings.warmUp]);
 
   const open = tasks.filter((t) => t.status === 'open' && t.kind !== 'milestone');
   const todays = open.filter((t) => t.plannedFor === today || t.dueDate === today);

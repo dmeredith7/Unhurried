@@ -80,7 +80,10 @@ export function Layout() {
         </NavLink>
       </header>
 
-      <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 pt-6 pb-28 md:px-10 md:pt-10 md:pb-12">
+      <main
+        id="main"
+        className={`mx-auto w-full ${pathname === '/week' ? 'max-w-6xl' : 'max-w-3xl'} flex-1 px-4 pt-6 pb-28 md:px-10 md:pt-10 md:pb-12`}
+      >
         <Outlet />
       </main>
 

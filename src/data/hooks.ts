@@ -36,3 +36,10 @@ export function useBlocks(): import('./types').WorkBlock[] | undefined {
 export function useBreakIdeas(): import('./types').BreakIdea[] | undefined {
   return useLiveQuery(async () => (await repos.breakIdeas.list()).sort((a, b) => a.order - b.order));
 }
+
+export function useScheduleData() {
+  return useLiveQuery(async () => ({
+    template: await repos.scheduleTemplate.list(),
+    overrides: await repos.scheduleOverrides.list(),
+  }));
+}

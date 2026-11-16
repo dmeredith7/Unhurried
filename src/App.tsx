@@ -8,6 +8,7 @@ import { GettingStarted } from './screens/GettingStarted';
 import { useApplyTheme } from './lib/theme';
 import { ComingSoon } from './screens/ComingSoon';
 import { FocusScreen } from './screens/FocusScreen';
+import { ScheduleScreen } from './screens/ScheduleScreen';
 import { TimerProvider } from './components/TimerProvider';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { TasksScreen } from './screens/TasksScreen';
@@ -41,14 +42,7 @@ export default function App() {
           <Route index element={<TodayScreen />} />
           <Route path="tasks" element={<TasksScreen />} />
           <Route path="focus" element={<FocusScreen />} />
-          <Route
-            path="week"
-            element={
-              <ComingSoon title="Unschedule" phase={4}>
-                Your week, with leisure planned first and real work filling in as you do it.
-              </ComingSoon>
-            }
-          />
+          <Route path="week" element={<ScheduleScreen />} />
           <Route
             path="goals"
             element={

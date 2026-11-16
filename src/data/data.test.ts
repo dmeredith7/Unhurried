@@ -52,3 +52,37 @@ describe('first-run setup', () => {
     expect((await repos.spaces.list()).map((s) => s.name)).toEqual(['Personal']);
   });
 });
+
+describe('schedule scopes', async () => {
+  const { addEntry, updateEntry, deleteEntry } = await import('./schedule');
+  const { resolveWeek } = await import('../domain/schedule');
+  const week = async (start: string) =>
+    resolveWeek(await repos.scheduleTemplate.list(), await repos.scheduleOverrides.list(), start);
+  const v = { date: '2026-11-18', startSlot: 36, endSlot: 38, kind: 'leisure' as const, label: 'Gym', spaceId: null };
+
+  it('edits only this week or every week', async () => {
+    await addEntry(v, true);
+    const [gym] = await week('2026-11-16');
+    await updateEntry(gym, { ...v, label: 'Swim' }, 'week');
+    expect((await week('2026-11-16')).map((e) => e.label)).toEqual(['Swim']);
+    expect((await week('2026-11-23')).map((e) => e.label)).toEqual(['Gym']);
+
+    const [nextGym] = await week('2026-11-23');
+    await updateEntry(nextGym, { ...v, date: '2026-11-26', label: 'Yoga' }, 'all');
+    expect((await week('2026-11-30')).map((e) => `${e.label}@${e.date}`)).toEqual(['Yoga@2026-12-03']);
+    expect((await week('2026-11-16')).map((e) => e.label)).toEqual(['Swim']); // this week's change kept
+  });
+
+  it('deletes only this week or every week', async () => {
+    await addEntry(v, true);
+    await addEntry({ ...v, date: '2026-11-21', label: 'Party' }, false);
+    const [gym, party] = await week('2026-11-16');
+    await deleteEntry(gym, 'week');
+    await deleteEntry(party, 'week');
+    expect(await week('2026-11-16')).toHaveLength(0);
+    expect((await week('2026-11-23')).map((e) => e.label)).toEqual(['Gym']);
+    const [g2] = await week('2026-11-23');
+    await deleteEntry(g2, 'all');
+    expect(await week('2026-11-30')).toHaveLength(0);
+  });
+});

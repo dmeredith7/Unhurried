@@ -135,12 +135,18 @@ export interface ScheduleTemplateEntry extends BaseRecord {
   spaceId?: string | null;
 }
 
-/** A change to one specific week: hide/replace a template entry, or add a one-off. */
+/**
+ * A one-week change. Either a one-off entry (no templateEntryId), or a
+ * replacement for one occurrence of a weekly entry: that occurrence (on
+ * `replacesDate`) is hidden, and unless `hidden` is set this entry shows on
+ * `date` instead. Keyed by calendar date so changing the week's start day
+ * never misplaces anything.
+ */
 export interface ScheduleOverride extends BaseRecord {
-  weekStart: string; // YYYY-MM-DD of that week's first day
-  templateEntryId?: string | null; // set when hiding/modifying a template entry
+  date: string; // YYYY-MM-DD where this entry appears
+  templateEntryId?: string | null;
+  replacesDate?: string | null;
   hidden?: boolean;
-  weekday: number;
   startSlot: number;
   endSlot: number;
   kind: ScheduleKind;

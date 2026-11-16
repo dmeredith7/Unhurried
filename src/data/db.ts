@@ -42,6 +42,10 @@ export class UnhurriedDB extends Dexie {
       settings: 'id',
       meta: 'key',
     });
+    // v2: week overrides are keyed by calendar date.
+    this.version(2).stores({
+      scheduleOverrides: 'id, date, updatedAt',
+    });
   }
 }
 
