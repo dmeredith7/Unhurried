@@ -21,6 +21,8 @@
   --gentle: #6b6f86; /* "still on your list": neutral, never red */
   --gentle-soft: #ecebf3;
   --focus-ring: #3f7a5a;
+  --chart-context: #c9c4b8; /* de-emphasized bars; values also in table view */
+  --chart-grid: #ece8e0;
   color-scheme: light;
 }
 
@@ -39,6 +41,8 @@
   --gentle: #b3b5c9;
   --gentle-soft: #2a2b35;
   --focus-ring: #8cc7a2;
+  --chart-context: #555b56;
+  --chart-grid: #2c302d;
   color-scheme: dark;
 }
 

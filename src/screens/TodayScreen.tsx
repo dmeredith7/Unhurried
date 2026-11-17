@@ -67,7 +67,12 @@ export function TodayScreen() {
                 {focusMinutes < 60 ? `${focusMinutes} min` : `${(focusMinutes / 60).toFixed(1).replace(/\.0$/, '')} h`} of
                 focus
               </p>
-              <p className="text-sm text-muted">That's real progress. Another block, or a well-earned break?</p>
+              <p className="text-sm text-muted">
+                That's real progress.{' '}
+                <Link to="/progress" className="underline underline-offset-2">
+                  See your week
+                </Link>
+              </p>
             </>
           ) : (
             <>

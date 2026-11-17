@@ -1,4 +1,4 @@
-import { CalendarDays, Flag, ListTodo, Settings, Sun, Timer } from 'lucide-react';
+import { CalendarDays, ChartColumn, Flag, ListTodo, Settings, Sun, Timer } from 'lucide-react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useTimer } from './TimerProvider';
 import * as T from '../domain/timer';
@@ -9,6 +9,7 @@ const NAV = [
   { to: '/focus', label: 'Focus', Icon: Timer },
   { to: '/week', label: 'Unschedule', short: 'Week', Icon: CalendarDays },
   { to: '/goals', label: 'Goals', Icon: Flag },
+  { to: '/progress', label: 'Progress', Icon: ChartColumn },
 ];
 
 export function Layout() {
@@ -82,7 +83,7 @@ export function Layout() {
 
       <main
         id="main"
-        className={`mx-auto w-full ${pathname === '/week' ? 'max-w-6xl' : 'max-w-3xl'} flex-1 px-4 pt-6 pb-28 md:px-10 md:pt-10 md:pb-12`}
+        className={`mx-auto w-full ${pathname === '/week' ? 'max-w-6xl' : pathname === '/progress' ? 'max-w-5xl' : 'max-w-3xl'} flex-1 px-4 pt-6 pb-28 md:px-10 md:pt-10 md:pb-12`}
       >
         <Outlet />
       </main>
@@ -106,14 +107,14 @@ export function Layout() {
         aria-label="Main"
         className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
       >
-        <ul className="grid grid-cols-5">
+        <ul className="grid grid-cols-6">
           {NAV.map(({ to, label, short, Icon, end }) => (
             <li key={to}>
               <NavLink
                 to={to}
                 end={end}
                 className={({ isActive }) =>
-                  `flex h-16 flex-col items-center justify-center gap-1 text-xs ${
+                  `flex h-16 flex-col items-center justify-center gap-1 text-[11px] ${
                     isActive ? 'font-medium text-accent' : 'text-muted'
                   }`
                 }

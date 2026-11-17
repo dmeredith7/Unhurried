@@ -103,7 +103,8 @@ describe('goals', async () => {
       firstStep: { title: 'List five name ideas', today: true },
     });
     const tasks = (await repos.tasks.list()).filter((t) => t.goalId === goal.id);
-    expect(tasks.filter((t) => t.kind === 'milestone').map((t) => t.title)).toEqual(['Pick a name', 'First issue sent']);
+    const milestones = tasks.filter((t) => t.kind === 'milestone').sort((a, b) => a.dueDate!.localeCompare(b.dueDate!));
+    expect(milestones.map((t) => t.title)).toEqual(['Pick a name', 'First issue sent']);
     const step = tasks.find((t) => t.kind === 'step')!;
     expect(step.parentId).toBe(tasks.find((t) => t.title === 'Pick a name')!.id);
     expect(step.plannedFor).toBeTruthy();

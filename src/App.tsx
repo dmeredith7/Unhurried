@@ -7,6 +7,7 @@ import { ensureDefaults, isOnboarded } from './data/setup';
 import { GettingStarted } from './screens/GettingStarted';
 import { useApplyTheme } from './lib/theme';
 import { GoalDetailScreen, GoalsScreen } from './screens/GoalsScreen';
+import { ProgressScreen } from './screens/ProgressScreen';
 import { FocusScreen } from './screens/FocusScreen';
 import { ScheduleScreen } from './screens/ScheduleScreen';
 import { TimerProvider } from './components/TimerProvider';
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="week" element={<ScheduleScreen />} />
           <Route path="goals" element={<GoalsScreen />} />
           <Route path="goals/:id" element={<GoalDetailScreen />} />
+          <Route path="progress" element={<ProgressScreen />} />
           <Route path="settings" element={<SettingsScreen />} />
           <Route path="*" element={<TodayScreen />} />
         </Route>

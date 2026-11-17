@@ -25,6 +25,10 @@ red overdue warnings, no streaks and no "missed" days.
 - **Goals (reverse calendar).** Start at the deadline and work backward through milestones until you reach a
   small first step you can take today. Milestones and steps are ordinary tasks. A timeline shows your progress.
   If a milestone slips, you choose to push the rest back or keep the deadline; it is never flagged as a failure.
+- **Progress dashboard.** For any week: hours of focused work, blocks, average focus quality, leisure protected,
+  tasks and goal steps finished. Charts show focus by day, the last 8 weeks, focus by space and your quality
+  ratings, plus progress bars for each goal. When the data clearly supports it, it notes when your focus tends to
+  be best. Every chart has a table view. There are no week-versus-week arrows or red/green changes, only what you did.
 - **Self-talk reframes.** "I have to" becomes "I choose to", "I must finish" becomes "When can I start?", and
   "This is too big" becomes "I can take one small step". You can turn these off.
 - **Your data stays yours.** Everything is stored in your browser (IndexedDB). There's no account and nothing is
@@ -74,9 +78,9 @@ Lucide icons and vite-plugin-pwa for offline support.
 ```
 src/
   data/        Storage: Dexie schema, repositories, hooks, backup, goals, schedule rules
-  domain/      Pure logic with tests: timer, recurrence, reframes, schedule, reverse calendar
+  domain/      Pure logic with tests: timer, recurrence, reframes, schedule, reverse calendar, stats
   components/  Shared UI: task and entry editors, timer provider, dialogs
-  screens/     Today, Tasks, Focus, Unschedule, Goals, Settings, Getting started
+  screens/     Today, Tasks, Focus, Unschedule, Goals, Progress, Settings, Getting started
   lib/         Dates, colors and icons, theme, sound and notifications, timer worker
 ```
 
